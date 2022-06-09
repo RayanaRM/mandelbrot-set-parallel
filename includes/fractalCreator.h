@@ -11,7 +11,11 @@
 #include <memory>
 #include <math.h>
 #include <assert.h>
-
+struct Some
+{
+	int 
+		x, y, red, green, blue;
+};
 class FractalCreator{
 private:
 	int _width;
@@ -31,14 +35,14 @@ private:
 private:
 	void writeBitmap(std::string fileName);
 	void calculateRangeTotals();
-	void calculateIterations();
-	void drawFractal();
+	void calculateIterations(int startX, int endX, int startY, int endY);
+	std::vector<Some> drawFractal();
 	void calculateTotalIterations();
 
 public:
 	FractalCreator(int width, int height);
 	void addZoom(const Zoom& zoom);
-	void run(std::string fileName);
+	std::vector<Some> run(int startX, int endX, int startY, int endY);
 	void addRange(double rangeEnd, const RGB& rgb);
 	int getRange(int iterations) const;
 };

@@ -1,0 +1,6 @@
+objects/
+.vscode/
+.idea/*
+
+main.out
+.DS_Store
