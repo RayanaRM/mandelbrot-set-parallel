@@ -1,16 +1,13 @@
-#include <iostream>
 #include "includes/fractalCreator.h"
+#include <iostream>
 #include <pthread.h>
-#include "includes/bitmap.h"
-#include <map>
 #include "includes/bitmap.h"
 
 int const WIDTH = 100;
 int const HEIGHT = 100;
 typedef unsigned char Pixel[5];
 
-struct ThreadArguments
-{
+struct ThreadArguments {
 	int
 			threadId,
 			startX,
@@ -28,16 +25,19 @@ void *threadFunction(void *threadArguments) {
 
 	FractalCreator frac(WIDTH, HEIGHT);
 	frac.addRange(0.0, RGB(0, 0, 0));
-	frac.addRange(1.0, RGB(255, 255, 255));
+	frac.addRange(1.0, RGB(0, 0, 255));
 	std::vector<Some> sr = frac.run(args->startX, args->endX, args->startY, args->endY);
-
+	// std::cout << args->startX << " | " << args->endX << " | " << args->startY << " | " << args->endY << " | " << std::endl;
 	for (int j = args->startY; j < args->endY; j++)	{
 		for (int i = args->startX; i < args->endX; i++) {
-			args->pixels[(j * 100) + i][0] = sr[(j * 100) + i].x;
-			args->pixels[(j * 100) + i][1] = sr[(j * 100) + i].y;
-			args->pixels[(j * 100) + i][2] = sr[(j * 100) + i].red;
-			args->pixels[(j * 100) + i][3] = sr[(j * 100) + i].green;
-			args->pixels[(j * 100) + i][4] = sr[(j * 100) + i].blue;
+			args->pixels[(j * WIDTH) + i][0] = sr[(j * WIDTH) + i].x;
+			args->pixels[(j * WIDTH) + i][1] = sr[(j * WIDTH) + i].y;
+			args->pixels[(j * WIDTH) + i][2] = sr[(j * WIDTH) + i].red;
+			args->pixels[(j * WIDTH) + i][3] = sr[(j * WIDTH) + i].green;
+			args->pixels[(j * WIDTH) + i][4] = sr[(j * WIDTH) + i].blue;
+
+			// std::cout << (j * WIDTH) + i << std::endl;
+			
 		}
 	}
 }
@@ -53,6 +53,7 @@ int main() {
 			qtdX = (IMG_WIDTH / DIV_WIDTH),
 			qtdY = (IMG_HEIGHT / DIV_HEIGHT),
 			tmpCont = 0,
+			// threadCount = 1;
 			threadCount = DIV_WIDTH * DIV_HEIGHT;
 
 	int(*numThread)[4] = new int[threadCount][4];
@@ -98,10 +99,10 @@ int main() {
 	for (int i = 0; i < threadCount; i++)	{
 		pthread_join(threads[i], NULL);
 	}
-
+	
 	for (int i = 0; i < HEIGHT; i++) {
 		for (int j = 0; j < WIDTH; j++) {
-			_bitmap.setPixel(pixels[(j * 100) + i][0], pixels[(j * 100) + i][1], pixels[(j * 100) + i][2], pixels[(j * 100) + i][3], pixels[(j * 100) + i][4]);
+			_bitmap.setPixel(pixels[(j * WIDTH) + i][0], pixels[(j * WIDTH) + i][1], pixels[(j * WIDTH) + i][2], pixels[(j * WIDTH) + i][3], pixels[(j * WIDTH) + i][4]);
 		}
 	}
 
