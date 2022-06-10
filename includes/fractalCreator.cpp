@@ -36,13 +36,12 @@ void FractalCreator::calculateRangeTotals(){
 	}
 }
 
-std::vector<Some> FractalCreator::run(int startX, int endX, int startY, int endY){
+std::vector<RGBValues> FractalCreator::run(int startX, int endX, int startY, int endY){
 
 	calculateIterations(startX, endX, startY, endY);
 	calculateTotalIterations();
 	calculateRangeTotals();
 	return drawFractal();
-	//writeBitmap(fileName);
 }
 
 void FractalCreator::addZoom(const Zoom& zoom){
@@ -69,8 +68,8 @@ int FractalCreator::getRange(int iterations) const{
 	return range;
 }
 
-std::vector<Some> FractalCreator::drawFractal(){
-	std::vector<Some> sr;
+std::vector<RGBValues> FractalCreator::drawFractal(){
+	std::vector<RGBValues> sr;
 	for(int y = 0; y < _height; y++){
 		for(int x = 0; x < _width; x++){
 
@@ -100,10 +99,7 @@ std::vector<Some> FractalCreator::drawFractal(){
 				blue = startColor.b + colorDiff.b * (double)totalPixels / rangeTotal;
 			}
 
-			_bitmap.setPixel(x, y, red, green, blue);
-			Some s1;
-			s1.x = x;
-			s1.y = y;
+			RGBValues s1;
 			s1.red = red;
 			s1.green = green;
 			s1.blue = blue;

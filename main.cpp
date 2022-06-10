@@ -3,60 +3,53 @@
 #include <pthread.h>
 #include "includes/bitmap.h"
 
-int const WIDTH = 1000;
-int const HEIGHT = 1000;
-typedef unsigned char Pixel[3];
+int const WIDTH = 100;
+int const HEIGHT = 100;
+int const DIV_HEIGHT = HEIGHT / 10;
+int const DIV_WIDTH = WIDTH / 10;
+typedef unsigned char ColorRGB[3];
 
-struct ThreadArguments {
+struct FractalParams {
 	int
-			threadId,
 			startX,
 			endX,
 			startY,
 			endY;
-	Pixel
-			*colors,
-			*pixels;
+	ColorRGB
+			*colors;
 };
 
-void *threadFunction(void *threadArguments) {
+void *buildFractal(void *threadArguments) {
 
-	ThreadArguments *args = static_cast<ThreadArguments *>(threadArguments);
+	FractalParams *args = static_cast<FractalParams *>(threadArguments);
 
 	FractalCreator frac(WIDTH, HEIGHT);
 	frac.addRange(0.0, RGB(0, 0, 0));
 	frac.addRange(1.0, RGB(0, 0, 255));
 	
-	std::vector<Some> sr = frac.run(args->startX, args->endX, args->startY, args->endY);
+	std::vector<RGBValues> sr = frac.run(args->startX, args->endX, args->startY, args->endY);
 	for (int j = args->startY; j < args->endY; j++)	{
 		for (int i = args->startX; i < args->endX; i++) {
-			args->pixels[(j * WIDTH) + i][0] = sr[(j * WIDTH) + i].red;
-			args->pixels[(j * WIDTH) + i][1] = sr[(j * WIDTH) + i].green;
-			args->pixels[(j * WIDTH) + i][2] = sr[(j * WIDTH) + i].blue;
+			args->colors[(j * WIDTH) + i][0] = sr[(j * WIDTH) + i].red;
+			args->colors[(j * WIDTH) + i][1] = sr[(j * WIDTH) + i].green;
+			args->colors[(j * WIDTH) + i][2] = sr[(j * WIDTH) + i].blue;
 		}
 	}
 }
 
 int main() {
-	static const int
-			DIV_HEIGHT = HEIGHT / 100,
-			DIV_WIDTH = WIDTH / 100,
-			IMG_HEIGHT = WIDTH,
-			IMG_WIDTH = HEIGHT;
-	int
-			qtdX = (IMG_WIDTH / DIV_WIDTH),
-			qtdY = (IMG_HEIGHT / DIV_HEIGHT),
-			tmpCont = 0,
-			// threadCount = 1;
-			threadCount = DIV_WIDTH * DIV_HEIGHT;
+	int tmpCont = 0;
+	int threadCount = DIV_WIDTH * DIV_HEIGHT;
+	int	qtdX = (WIDTH / DIV_WIDTH);
+	int	qtdY = (HEIGHT / DIV_HEIGHT);
 
 	int(*numThread)[4] = new int[threadCount][4];
 
 	// cria o buffer de trabalho
 	int imgY = 0;
-	while (imgY < IMG_HEIGHT)	{
+	while (imgY < HEIGHT)	{
 		int imgX = 0;
-		while (imgX < IMG_WIDTH) {
+		while (imgX < WIDTH) {
 			numThread[tmpCont][0] = imgX;
 			numThread[tmpCont][1] = imgY;
 			numThread[tmpCont][2] = imgX + qtdX;
@@ -71,23 +64,22 @@ int main() {
 	bmp::Bitmap _bitmap(WIDTH, HEIGHT);
 	
 	pthread_t *threads = new pthread_t[threadCount];
-	ThreadArguments *threadArguments = new ThreadArguments[threadCount];
-	Pixel *pixels = new Pixel[IMG_HEIGHT * IMG_WIDTH];
+	FractalParams *threadArguments = new FractalParams[threadCount];
+	ColorRGB *colors = new ColorRGB[HEIGHT * WIDTH];
 
 	for (int i = 0; i < threadCount; i++)	{
 
-		ThreadArguments currentThreadArguments = {
-			.threadId = i,
+		FractalParams currentThreadArguments = {
 			.startX = numThread[i][0],
 			.endX = numThread[i][2],
 			.startY = numThread[i][1],
 			.endY = numThread[i][3],
-			.pixels = pixels
+			.colors = colors
 		};
 
 		threadArguments[i] = currentThreadArguments;
 
-		pthread_create(&threads[i], NULL, threadFunction, &threadArguments[i]);
+		pthread_create(&threads[i], NULL, buildFractal, &threadArguments[i]);
 	}
 
 	for (int i = 0; i < threadCount; i++)	{
@@ -96,7 +88,7 @@ int main() {
 	
 	for (int i = 0; i < HEIGHT; i++) {
 		for (int j = 0; j < WIDTH; j++) {
-			_bitmap.setPixel(i, j, pixels[(j * WIDTH) + i][0], pixels[(j * WIDTH) + i][1], pixels[(j * WIDTH) + i][2]);
+			_bitmap.setPixel(i, j, colors[(j * WIDTH) + i][0], colors[(j * WIDTH) + i][1], colors[(j * WIDTH) + i][2]);
 		}
 	}
 
