@@ -3,8 +3,8 @@
 #include <pthread.h>
 #include "includes/bitmap.h"
 
-int const width = 400;
-int const height = 400;
+int const width = 100;
+int const height = 100;
 int const blocoX = 10;
 int const blocoY = 10;
 typedef unsigned char ColorRGB[3];
@@ -38,8 +38,6 @@ void *buildFractal(void *fractalParams) {
 int main() {
 	int tmpCont = 0;
 	int qtdThreads = blocoY * blocoX;
-	int	qtdX = width / blocoY;
-	int	qtdY = height / blocoX;
 
 	// cria o buffer de trabalho
 	int(*bufferTrab)[4] = new int[qtdThreads][4];
@@ -49,14 +47,14 @@ int main() {
 		while (X < width) {
 			bufferTrab[tmpCont][0] = X;
 			bufferTrab[tmpCont][1] = Y;
-			bufferTrab[tmpCont][2] = X + qtdX;
-			bufferTrab[tmpCont][3] = Y + qtdY;
+			bufferTrab[tmpCont][2] = X + (width / blocoY);
+			bufferTrab[tmpCont][3] = Y + (height / blocoX);
 
 			tmpCont++;
-			X += qtdX;
+			X += (width / blocoY);
 		}
 
-		Y += qtdY;
+		Y += (height / blocoX);
 	}
 	
 	pthread_t *threads = new pthread_t[qtdThreads];
