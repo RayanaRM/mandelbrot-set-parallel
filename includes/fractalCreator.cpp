@@ -125,6 +125,8 @@ void FractalCreator::calculateIterations(int startX, int endX, int startY, int e
 
 	for(int y = 0; y < _height; y++){
 		for(int x = 0; x < _width; x++){
+	// for(int y = startY; y < endY; y++){
+	// 	for(int x = startX; x < endX; x++){
 
 			std::pair<double, double> coordenates = _zoomList.doZoom(x, y);
 			int iterations = Mandelbrot::getIterations(coordenates.first, coordenates.second);
