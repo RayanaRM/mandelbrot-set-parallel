@@ -3,9 +3,9 @@
 #include <pthread.h>
 #include "includes/bitmap.h"
 
-int const WIDTH = 100;
-int const HEIGHT = 100;
-typedef unsigned char Pixel[5];
+int const WIDTH = 1000;
+int const HEIGHT = 1000;
+typedef unsigned char Pixel[3];
 
 struct ThreadArguments {
 	int
@@ -26,27 +26,21 @@ void *threadFunction(void *threadArguments) {
 	FractalCreator frac(WIDTH, HEIGHT);
 	frac.addRange(0.0, RGB(0, 0, 0));
 	frac.addRange(1.0, RGB(0, 0, 255));
+	
 	std::vector<Some> sr = frac.run(args->startX, args->endX, args->startY, args->endY);
-	// std::cout << args->startX << " | " << args->endX << " | " << args->startY << " | " << args->endY << " | " << std::endl;
 	for (int j = args->startY; j < args->endY; j++)	{
 		for (int i = args->startX; i < args->endX; i++) {
-			args->pixels[(j * WIDTH) + i][0] = sr[(j * WIDTH) + i].x;
-			args->pixels[(j * WIDTH) + i][1] = sr[(j * WIDTH) + i].y;
-			args->pixels[(j * WIDTH) + i][2] = sr[(j * WIDTH) + i].red;
-			args->pixels[(j * WIDTH) + i][3] = sr[(j * WIDTH) + i].green;
-			args->pixels[(j * WIDTH) + i][4] = sr[(j * WIDTH) + i].blue;
-
-			// std::cout << (j * WIDTH) + i << std::endl;
-			
+			args->pixels[(j * WIDTH) + i][0] = sr[(j * WIDTH) + i].red;
+			args->pixels[(j * WIDTH) + i][1] = sr[(j * WIDTH) + i].green;
+			args->pixels[(j * WIDTH) + i][2] = sr[(j * WIDTH) + i].blue;
 		}
 	}
 }
 
 int main() {
-	
 	static const int
-			DIV_HEIGHT = HEIGHT / 10,
-			DIV_WIDTH = WIDTH / 10,
+			DIV_HEIGHT = HEIGHT / 100,
+			DIV_WIDTH = WIDTH / 100,
 			IMG_HEIGHT = WIDTH,
 			IMG_WIDTH = HEIGHT;
 	int
@@ -102,7 +96,7 @@ int main() {
 	
 	for (int i = 0; i < HEIGHT; i++) {
 		for (int j = 0; j < WIDTH; j++) {
-			_bitmap.setPixel(pixels[(j * WIDTH) + i][0], pixels[(j * WIDTH) + i][1], pixels[(j * WIDTH) + i][2], pixels[(j * WIDTH) + i][3], pixels[(j * WIDTH) + i][4]);
+			_bitmap.setPixel(i, j, pixels[(j * WIDTH) + i][0], pixels[(j * WIDTH) + i][1], pixels[(j * WIDTH) + i][2]);
 		}
 	}
 
